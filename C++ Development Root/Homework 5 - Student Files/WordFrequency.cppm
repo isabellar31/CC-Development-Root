@@ -14,7 +14,9 @@ module;                                                                         
   /// Hint:  Import only what you use, use everything you import
   ///
   /// Do not put anything else in this section, i.e. classes, functions, etc.
+export module WordFrequency;
 
+import std;
 /////////////////////// END-TO-DO (1) ////////////////////////////
 
 
@@ -42,7 +44,7 @@ class WordFrequency
       /// implementation of a hash table, to store the association of words (key) to the number of times a word occurs (value). Be
       /// sure to provide all three types when defining the std::unordered_map, including setting std::unordered_map's third
       /// argument to Hasher (WordFrequency's template parameter).
-
+    std::unordered_map<std::string, std::size_t, Hasher> _wordCounts;
     /////////////////////// END-TO-DO (2) ////////////////////////////
 };    // class WordFrequency
 
@@ -95,7 +97,19 @@ inline std::string sanitize( std::string_view word )
 
 // Implement WordFrequency::WordFrequency( std::istream ) - See requirements
 ///////////////////////// TO-DO (3) //////////////////////////////
-
+template<typename Hasher>
+WordFrequency<Hasher>::WordFrequency( std::istream & iStream )
+{
+  std::string word;
+  while( iStream >> word )
+  {
+    auto clean = sanitize( word );
+    if( !clean.empty() )
+    {
+      ++_wordCounts[ clean ];
+    }
+  }
+}
 /////////////////////// END-TO-DO (3) ////////////////////////////
 
 
@@ -106,7 +120,11 @@ inline std::string sanitize( std::string_view word )
 
 // Implement WordFrequency::numberOfWords() const - See requirements
 ///////////////////////// TO-DO (4) //////////////////////////////
-
+template<typename Hasher>
+std::size_t WordFrequency<Hasher>::numberOfWords() const
+{
+  return _wordCounts.size();
+}
 /////////////////////// END-TO-DO (4) ////////////////////////////
 
 
@@ -117,7 +135,14 @@ inline std::string sanitize( std::string_view word )
 
 // Implement WordFrequency::wordCount( const std::string & ) const - See requirements
 ///////////////////////// TO-DO (5) //////////////////////////////
+template<typename Hasher>
+std::size_t WordFrequency<Hasher>::wordCount( std::string_view word ) const
+{
+  auto clean = sanitize( word );
+  auto iter  = _wordCounts.find( clean );
 
+  return iter == _wordCounts.end() ? 0u : iter->second;
+}
 /////////////////////// END-TO-DO (5) ////////////////////////////
 
 
@@ -128,7 +153,22 @@ inline std::string sanitize( std::string_view word )
 
 // Implement WordFrequency::mostFrequentWord() const - See requirements
 ///////////////////////// TO-DO (6) //////////////////////////////
+template<typename Hasher>
+std::string WordFrequency<Hasher>::mostFrequentWord() const
+{
+  if( _wordCounts.empty() ) return "";
 
+  auto maxIter = _wordCounts.begin();
+  for( auto iter = _wordCounts.begin(); iter != _wordCounts.end(); ++iter )
+  {
+    if( iter->second > maxIter->second )
+    {
+      maxIter = iter;
+    }
+  }
+
+  return maxIter->first;
+}
 /////////////////////// END-TO-DO (6) ////////////////////////////
 
 
@@ -140,7 +180,18 @@ inline std::string sanitize( std::string_view word )
 // Implement WordFrequency::maxBucketSize() const - See requirements
 ///////////////////////// TO-DO (7) //////////////////////////////
   /// Hint: see the unordered_map's bucket interface at https://en.cppreference.com/w/cpp/container/unordered_map
+template<typename Hasher>
+std::size_t WordFrequency<Hasher>::maxBucketSize() const
+{
+  std::size_t maxSize = 0;
 
+  for( std::size_t i = 0; i < _wordCounts.bucket_count(); ++i )
+  {
+    maxSize = std::max( maxSize, _wordCounts.bucket_size( i ) );
+  }
+
+  return maxSize;
+}
 /////////////////////// END-TO-DO (7) ////////////////////////////
 
 
@@ -151,7 +202,14 @@ inline std::string sanitize( std::string_view word )
 
 // Implement WordFrequency::bucketSizeAverage() const - See requirements
 ///////////////////////// TO-DO (8) //////////////////////////////
+template<typename Hasher>
+double WordFrequency<Hasher>::bucketSizeAverage() const
+{
+  if( _wordCounts.bucket_count() == 0 ) return 0.0;
 
+  return static_cast<double>( _wordCounts.size() ) /
+         static_cast<double>( _wordCounts.bucket_count() );
+}
 /////////////////////// END-TO-DO (8) ////////////////////////////
 
 

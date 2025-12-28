@@ -3,9 +3,7 @@
   /// Hint:  Import only what you use, use everything you import
   ///
   /// Do not put anything else in this section, i.e. classes, functions, etc.
-import std;
-import WordFrequency;
-import Regression.CheckResults;
+
 /////////////////////// END-TO-DO (1) ////////////////////////////
 
 
@@ -32,15 +30,7 @@ namespace
     std::size_t operator()( const std::string & key ) const noexcept
     {
       ///////////////////////// TO-DO (2) //////////////////////////////
-      constexpr std::size_t base = 31;
-      std::size_t hash = 0;
 
-      for( unsigned char c : key )
-      {
-        hash = hash * base + c;
-      }
-
-      return hash;
       /////////////////////// END-TO-DO (2) ////////////////////////////
     }
   };
